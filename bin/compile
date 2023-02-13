@@ -1,0 +1,26 @@
+#!/bin/sh
+
+curl -s -o pgbadger.tar.gz -L https://github.com/darold/pgbadger/archive/refs/tags/v12.0.tar.gz
+tar xzf pgbadger.tar.gz
+
+VENDORED_PGBADGER="bin"
+BUILD_DIR=$1
+BUILDPACK_DIR="$(dirname "$(dirname "$0")")"
+
+echo '------Install paths-------'
+echo $VENDORED_PGBADGER
+echo $BUILD_DIR
+echo $BUILDPACK_DIR
+echo $BUILD_DIR/$VENDORED_PGBADGER
+echo '--------------------------'
+
+mkdir -p "$BUILD_DIR/bin"
+mkdir -p "$BUILD_DIR/$VENDORED_PGBADGER"
+
+cd pgbadger-12.0
+perl Makefile.PL INSTALLDIRS=vendor DESTDIR="/app"
+make && DESTDIR="/app" make install
+
+cp /app/usr/bin/pgbadger "$BUILD_DIR/$VENDORED_PGBADGER"
+
+echo 'Done!'
